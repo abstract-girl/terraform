@@ -1,0 +1,54 @@
+name: Terraform Apply
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.YC_ACCESS_KEY }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.YC_SECRET_KEY }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v2
+    
+    - name: Terraform Init
+      run: terraform init -backend-config="access_key=${{ secrets.YC_ACCESS_KEY }}" -backend-config="secret_key=${{ secrets.YC_SECRET_KEY }}"
+      env:
+        YC_TOKEN: ${{ secrets.YC_TOKEN }}
+        YC_CLOUD_ID: ${{ secrets.YC_CLOUD_ID }}
+        YC_FOLDER_ID: ${{ secrets.YC_FOLDER_ID }}
+    
+    - name: Terraform Validate
+      run: terraform validate
+      env:
+        YC_TOKEN: ${{ secrets.YC_TOKEN }}
+        YC_CLOUD_ID: ${{ secrets.YC_CLOUD_ID }}
+        YC_FOLDER_ID: ${{ secrets.YC_FOLDER_ID }}
+    
+    - name: Terraform Plan
+      if: github.event_name == 'pull_request'
+      run: terraform plan
+      env:
+        YC_TOKEN: ${{ secrets.YC_TOKEN }}
+        YC_CLOUD_ID: ${{ secrets.YC_CLOUD_ID }}
+        YC_FOLDER_ID: ${{ secrets.YC_FOLDER_ID }}
+    
+    - name: Terraform Apply
+      if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+      run: terraform apply -auto-approve
+      env:
+        YC_TOKEN: ${{ secrets.YC_TOKEN }}
+        YC_CLOUD_ID: ${{ secrets.YC_CLOUD_ID }}
+        YC_FOLDER_ID: ${{ secrets.YC_FOLDER_ID }} 
