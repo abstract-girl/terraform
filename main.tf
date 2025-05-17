@@ -11,7 +11,7 @@ terraform {
       s3 = "https://storage.yandexcloud.net"
     }
     bucket     = "bucket-tf-main"
-    region     = "ru-central1"
+    region     = "ru-central1-a"
     key        = "terraform.tfstate"
     
     skip_region_validation      = true
@@ -28,6 +28,7 @@ provider "yandex" {
 
 module "s3" {
    source      = "./s3"
-   bucket_name = "my-yandex-cloud-bucket"
+   bucket_name = "my-abstract-yandex-cloud-bucket"
    acl         = "private"
- }
+   folder_id = var.yc_folder_id
+}

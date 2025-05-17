@@ -8,3 +8,8 @@ variable "acl" {
   type        = string
   default     = "private"
 } 
+
+variable "folder_id" {
+  description = "The Yandex Cloud folder ID"
+  type        = string
+}
